@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letter of Intent with Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f0f0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Admin Panel Styles */
+        .admin-panel {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .admin-header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .admin-header h2 {
+            font-size: 1.5rem;
+        }
+        
+        .admin-tabs {
+            display: flex;
+            background-color: #34495e;
+        }
+        
+        .admin-tab {
+            padding: 12px 20px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .admin-tab.active {
+            background-color: #1abc9c;
+        }
+        
+        .admin-tab:hover:not(.active) {
+            background-color: #2c3e50;
+        }
+        
+        .admin-content {
+            padding: 20px;
+            display: none;
+        }
+        
+        .admin-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, 
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+        
+        .form-col {
+            flex: 1;
+            padding: 0 10px;
+            min-width: 250px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #1abc9c;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #16a085;
+        }
+        
+        .btn-secondary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        /* Table Editor */
+        .table-editor {
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .products-table th, 
+        .products-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        
+        .products-table th {
+            background-color: #f2f2f2;
+        }
+        
+        .products-table input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .products-table .amount-cell {
+            font-weight: bold;
+        }
+        
+        .products-table .total-row td {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+        
+        .table-actions {
+            margin-top: 10px;
+        }
+        
+        /* Letter of Intent Styles */
+        .letter-container {
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .letter-header {
+            position: relative;
+            height: 150px;
+            overflow: hidden;
+        }
+        
+        .wave-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1e5799;
+            border-bottom-right-radius: 50%;
+            border-bottom-left-radius: 30%;
+        }
+        
+        .wave-top-light {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background-color: #3498db;
+            border-bottom-right-radius: 70%;
+        }
+        
+        .logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 110px;
+            height: 110px;
+            z-index: 2;
+        }
+        
+        .letter-content {
+            padding: 20px 40px;
+        }
+        
+        .letter-addresses {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .sender-info, 
+        .recipient-info {
+            max-width: 45%;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .sender-info, 
+            .recipient-info {
+                max-width: 100%;
+            }
+        }
+        
+        .letter-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #444;
+            margin-bottom: 30px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        
+        .letter-body {
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .letter-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        
+        .letter-table th, 
+        .letter-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .letter-table th {
+            background-color: #f9f9f9;
+        }
+        
+        .letter-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .signature {
+            max-width: 45%;
+        }
+        
+        .date {
+            text-align: right;
+            color: #3498db;
+        }
+        
+        .watermark {
+            position: relative;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .watermark-image {
+            position: absolute;
+            opacity: 0.2;
+            width: 300px;
+            height: auto;
+        }
+        
+        .watermark-text {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            opacity: 0.3;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .watermark-subtext {
+            font-size: 0.8rem;
+        }
+        
+        .letter-bottom {
+            background-color: #1e5799;
+            color: white;
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            margin-right: 15px;
+        }
+        
+        .contact-icon {
+            background-color: #f1c40f;
+            color: black;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .letter-content {
+                padding: 15px;
+            }
+            
+            .letter-title {
+                font-size: 2rem;
+            }
+            
+            .letter-bottom {
+                flex-direction: column;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            .admin-panel {
+                display: none;
+            }
+            
+            .letter-container {
+                box-shadow: none;
+            }
+            
+            body {
+                background-color: white;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Admin Panel -->
+        <div class="admin-panel">
+            <div class="admin-header">
+                <h2>Letter of Intent - Admin Panel</h2>
+                <div>
+                    <button class="btn btn-primary" id="previewBtn">Preview Changes</button>
+                    <button class="btn btn-secondary" id="printBtn">Print</button>
+                </div>
+            </div>
+            <div class="admin-tabs">
+                <div class="admin-tab active" data-tab="company-info">Company Info</div>
+                <div class="admin-tab" data-tab="letter-content">Letter Content</div>
+                <div class="admin-tab" data-tab="products">Products</div>
+                <div class="admin-tab" data-tab="shipping">Shipping & Terms</div>
+            </div>
+            <div class="admin-content active" id="company-info">
+                <div class="form-row">
+                    <div class="form-col">
+                        <h3>Sender Information</h3>
+                        <div class="form-group">
+                            <label for="senderCompany">Company Name</label>
+                            <input type="text" id="senderCompany" value="DEANLURE GLOBAL TRADE">
+                        </div>
+                        <div class="form-group">
+                            <label for="senderAddress">Address</label>
+                            <input type="text" id="senderAddress" value="705 pier suite WA 98658 LA, united states.">
+                        </div>
+                        <div class="form-group">
+                            <label for="senderPhone">Contact Number</label>
+                            <input type="text" id="senderPhone" value="+1 (787) 699-2930">
+                        </div>
+                        <div class="form-group">
+                            <label for="senderEmail">Email</label>
+                            <input type="text" id="senderEmail" value="deanluregloblaltrade@yahoo.com">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <h3>Recipient Information</h3>
+                        <div class="form-group">
+                            <label for="recipientCompany">Company Name</label>
+                            <input type="text" id="recipientCompany" value="ROSMA BISCUIT CUPS">
+                        </div>
+                        <div class="form-group">
+                            <label for="recipientAddress">Address</label>
+                            <textarea id="recipientAddress">6/415, Nedumbassery Airport Junction, NH-47 Angamaly-Athani Road, Near Petterumadom Dispensary, Keriyad, Post Mekkad, Ernakulam District, Kerala, 683 589.</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="recipientPhone">Contact Number</label>
+                            <input type="text" id="recipientPhone" value="+ 918289891783">
+                        </div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="saveCompanyInfo">Save Changes</button>
+                </div>
+            </div>
+            <div class="admin-content" id="letter-content">
+                <div class="form-group">
+                    <label for="letterTitle">Letter Title</label>
+                    <input type="text" id="letterTitle" value="Letter Of Intent">
+                </div>
+                <div class="form-group">
+                    <label for="letterGreeting">Greeting</label>
+                    <input type="text" id="letterGreeting" value="Dear Sir/Madam,">
+                </div>
+                <div class="form-group">
+                    <label for="letterIntro">Introduction Paragraph</label>
+                    <textarea id="letterIntro">We Take The Opportunity To Declare Our Intention To purchase some goods from our company. Our company is duly organized and exists under the laws of the province of LA, United States, The principal business address of our company is</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="letterBody">Body Paragraph</label>
+                    <textarea id="letterBody">705 pier suite WA 98658 LA, united states. Our principal activities include paint and-sip services for our customers. In line with the above-stated, we, DEANLURE GLOBAL TRADE , hereby confirm with all responsibility that we are willing and able to enter into a contract for the purchase of the following items, as specified below:</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="letterConclusion">Conclusion</label>
+                    <textarea id="letterConclusion">We understand that this letter of intent is a starting point for further negotiations and operates as a framework under which the transaction can proceed.
+
+We look forward to working with you on the proposal, hopefully beneficial for both entities</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="signatureName">Signature Name</label>
+                    <input type="text" id="signatureName" value="Jacob Dean">
+                </div>
+                <div class="form-group">
+                    <label for="signatureTitle">Signature Title</label>
+                    <input type="text" id="signatureTitle" value="Purchased Manager of the DEAN LURE GLOBAL TRADE">
+                </div>
+                <div class="form-group">
+                    <label for="letterDate">Date</label>
+                    <input type="text" id="letterDate" value="07 April 2025">
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="saveLetterContent">Save Changes</button>
+                </div>
+            </div>
+            <div class="admin-content" id="products">
+                <h3>Products Table</h3>
+                <div class="table-editor">
+                    <table class="products-table" id="productsTable">
+                        <thead>
+                            <tr>
+                                <th>Products</th>
+                                <th>Quantity</th>
+                                <th>Price per piece</th>
+                                <th>Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Rows will be added here by JavaScript -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td colspan="3" style="text-align: right;">Total:</td>
+                                <td class="total-amount">$0.00</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="table-actions">
+                    <button class="btn btn-secondary" id="addProductRow">Add Product</button>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="saveProducts">Save Changes</button>
+                </div>
+            </div>
+            <div class="admin-content" id="shipping">
+                <div class="form-group">
+                    <label for="deliveryNote">Delivery Note</label>
+                    <textarea id="deliveryNote">Note you can Delivered the same quantity, in one or more parts, within 45 days,
+Required Documents Necessary In Export Business (Like global rating GOVT.Approval)along with Credibility Letter.</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="sourcingPort">Sourcing Port</label>
+                    <input type="text" id="sourcingPort" value="JNPT ,Mumbai ( India )">
+                </div>
+                <div class="form-group">
+                    <label for="destinationPoint">Destination Point</label>
+                    <input type="text" id="destinationPoint" value="port of Houston (Texas)">
+                </div>
+                <div class="form-group">
+                    <label for="deliveryTerms">Delivery Terms</label>
+                    <input type="text" id="deliveryTerms" value="FOB:JNPT, Mumbai (India)">
+                </div>
+                <div class="form-group">
+                    <label for="deliveryTime">Delivery Time</label>
+                    <input type="text" id="deliveryTime" value="65 working days from the date of Purchase Payment">
+                </div>
+                <div class="form-group">
+                    <label for="paymentMethod">Payment Method</label>
+                    <input type="text" id="paymentMethod" value="75% Advanced & Rest of 25% against B/L">
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="saveShipping">Save Changes</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Letter of Intent Preview -->
+        <div class="letter-container" id="letterPreview">
+            <div class="letter-header">
+                <div class="wave-top"></div>
+                <div class="wave-top-light"></div>
+                <img src="https://lh3.googleusercontent.com/pw/AP1GczN7BarYEDV9EXklCjEMcjzDYP3JX-9ZYXrfxGKmQoB2QZSPbkHT-tt3gBFYnzzJNNvqKcE0Gdd6qya7k-wsGxc9JMvSCph0TSwemYWTiaVOPcF22t17d6s4JXN1v8QSmxqBjs4cgZwJE2Wr4i-FweM=w490-h509-s-no-gm?authuser=0" alt="DEANLURE GLOBAL TRADE" class="logo">
+            </div>
+            
+            <div class="letter-content">
+                <div class="letter-addresses">
+                    <div class="sender-info">
+                        <p><strong>From:<span id="preview-senderCompany">DEANLURE GLOBAL TRADE</span></strong></p>
+                        <p id="preview-senderAddress">705 pier suite WA 98658 LA, united states.</p>
+                        <p>ContactNo.<span id="preview-senderPhone">+1 (787) 699-2930</span></p>
+                        <p>Email:<span id="preview-senderEmail">deanluregloblaltrade@yahoo.com</span></p>
+                    </div>
+                    
+                    <div class="recipient-info">
+                        <p><strong>To: <span id="preview-recipientCompany">ROSMA BISCUIT CUPS</span></strong></p>
+                        <p>Add : <span id="preview-recipientAddress">6/415, Nedumbassery Airport Junction, NH-47 Angamaly-Athani Road, Near Petterumadom Dispensary, Keriyad, Post Mekkad, Ernakulam District, Kerala, 683 589.</span></p>
+                        <p>Contact No.<span id="preview-recipientPhone">+ 918289891783</span></p>
+                    </div>
+                </div>
+                
+                <div class="letter-title" id="preview-letterTitle">Letter Of Intent</div>
+                
+                <div class="letter-body">
+                    <p id="preview-letterGreeting">Dear Sir/Madam,</p>
+                    <br>
+                    <p id="preview-letterIntro">We Take The Opportunity To Declare Our Intention To purchase some goods from our company. Our company is duly organized and exists under the laws of the province of LA, United States, The principal business address of our company is</p>
+                    <br>
+                    <p id="preview-letterBody">705 pier suite WA 98658 LA, united states. Our principal activities include paint and-sip services for our customers. In line with the above-stated, we, DEANLURE GLOBAL TRADE , hereby confirm with all responsibility that we are willing and able to enter into a contract for the purchase of the following items, as specified below:</p>
+                </div>
+                
+                <table class="letter-table" id="preview-productsTable">
+                    <thead>
+                        <tr>
+                            <th>Products</th>
+                            <th>Quantity</th>
+                            <th>Price per piece</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be added here by JavaScript -->
+                    </tbody>
+                </table>
+                
+                <div class="letter-body">
+                    <p id="preview-deliveryNote">Note you can Delivered the same quantity, in one or more parts, within 45 days,
+Required Documents Necessary In Export Business (Like global rating GOVT.Approval)along with Credibility Letter.</p>
+                    <br>
+                    <p>Sourcing port:-<span id="preview-sourcingPort">JNPT ,Mumbai ( India )</span></p>
+                    <p>Destination point: <span id="preview-destinationPoint">port of Houston (Texas)</span></p>
+                    <p>Delivery terms : <span id="preview-deliveryTerms">FOB:JNPT, Mumbai (India)</span></p>
+                    <p>Delivery Time: <span id="preview-deliveryTime">65 working days from the date of Purchase Payment</span></p>
+                    <p>method: <span id="preview-paymentMethod">75% Advanced & Rest of 25% against B/L</span></p>
+                    <br>
+                    <p id="preview-letterConclusion">We understand that this letter of intent is a starting point for further negotiations and operates as a framework under which the transaction can proceed.
+
+We look forward to working with you on the proposal, hopefully beneficial for both entities</p>
+                </div>
+                
+                <div class="letter-footer">
+                    <div class="signature">
+                        <p>Respectfully,</p>
+                        <p id="preview-signatureName">Jacob Dean</p>
+                        <p id="preview-signatureTitle">Purchased Manager of the DEAN LURE GLOBAL TRADE</p>
+                    </div>
+                    <div class="date">
+                        <p>Date:<span id="preview-letterDate">07 April 2025</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="watermark">
+                <img src="https://lh3.googleusercontent.com/pw/AP1GczN7BarYEDV9EXklCjEMcjzDYP3JX-9ZYXrfxGKmQoB2QZSPbkHT-tt3gBFYnzzJNNvqKcE0Gdd6qya7k-wsGxc9JMvSCph0TSwemYWTiaVOPcF22t17d6s4JXN1v8QSmxqBjs4cgZwJE2Wr4i-FweM=w490-h509-s-no-gm?authuser=0" alt="DEANLURE Watermark" class="watermark-image">
+                <div class="watermark-text">
+                    DEANLURE
+                    <div class="watermark-subtext">GLOBAL TRADE</div>
+                </div>
+            </div>
+            
+            <div class="letter-bottom">
+                <div class="contact-item">
+                    <div class="contact-icon">📞</div>
+                    <span>United States<span id="preview-footer-phone">+1 (787) 699-2930</span></span>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">✉️</div>
+                    <span id="preview-footer-email">deanluregloblaltrade@yahoo.com</span>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">📍</div>
+                    <span id="preview-footer-address">705 pier suite WA 98658 LA, united states</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Products data - single source of truth
+        let productsData = [
+            {
+                name: "Cup Size",
+                quantity: "250,000 piece",
+                price: "$0.0931",
+                amount: "$26,201"
+            }
+        ];
+
+        // Tab Switching
+        const tabs = document.querySelectorAll('.admin-tab');
+        const contents = document.querySelectorAll('.admin-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Initialize products table
+        function initializeProductsTable() {
+            const tbody = document.querySelector('#productsTable tbody');
+            tbody.innerHTML = '';
+            
+            let total = 0;
+            
+            productsData.forEach((product, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="text" class="product-name" value="${product.name}"></td>
+                    <td><input type="text" class="product-quantity" value="${product.quantity}"></td>
+                    <td><input type="text" class="product-price" value="${product.price}"></td>
+                    <td><input type="text" class="product-amount" value="${product.amount}"></td>
+                    <td><button class="btn btn-danger btn-sm delete-row" data-index="${index}">Delete</button></td>
+                `;
+                tbody.appendChild(row);
+                
+                // Add to total
+                const amountValue = parseFloat(product.amount.replace(/[^0-9.]/g, '')) || 0;
+                total += amountValue;
+            });
+            
+            // Update total
+            document.querySelector('.total-amount').textContent = '$' + total.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            
+            // Update preview
+            updateProductsPreview();
+        }
+
+        // Update products preview
+        function updateProductsPreview() {
+            const previewTbody = document.querySelector('#preview-productsTable tbody');
+            previewTbody.innerHTML = '';
+            
+            let total = 0;
+            
+            productsData.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${product.quantity}</td>
+                    <td>${product.price}</td>
+                    <td>${product.amount}</td>
+                `;
+                previewTbody.appendChild(row);
+                
+                // Add to total
+                const amountValue = parseFloat(product.amount.replace(/[^0-9.]/g, '')) || 0;
+                total += amountValue;
+            });
+            
+            // Add total row
+            const totalRow = document.createElement('tr');
+            totalRow.className = 'total-row';
+            totalRow.innerHTML = `
+                <td colspan="3" style="text-align: right;"><strong>Total</strong></td>
+                <td><strong>$` + total.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }) + `</strong></td>
+            `;
+            previewTbody.appendChild(totalRow);
+        }
+
+        // Add Product Row
+        document.getElementById('addProductRow').addEventListener('click', () => {
+            productsData.push({
+                name: "",
+                quantity: "0 piece",
+                price: "$0.00",
+                amount: "$0.00"
+            });
+            initializeProductsTable();
+        });
+
+        // Delete Product Row
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('delete-row')) {
+                const index = e.target.getAttribute('data-index');
+                productsData.splice(index, 1);
+                initializeProductsTable();
+            }
+        });
+
+        // Save Products
+        document.getElementById('saveProducts').addEventListener('click', function() {
+            // Update productsData with current inputs
+            const rows = document.querySelectorAll('#productsTable tbody tr');
+            productsData = [];
+            
+            rows.forEach(row => {
+                productsData.push({
+                    name: row.querySelector('.product-name').value,
+                    quantity: row.querySelector('.product-quantity').value,
+                    price: row.querySelector('.product-price').value,
+                    amount: row.querySelector('.product-amount').value
+                });
+            });
+            
+            updatePreview();
+            alert('Products saved!');
+        });
+
+        // Preview Button
+        document.getElementById('previewBtn').addEventListener('click', updatePreview);
+        
+        // Print Button
+        document.getElementById('printBtn').addEventListener('click', () => {
+            window.print();
+        });
+        
+        // Save Company Info
+        document.getElementById('saveCompanyInfo').addEventListener('click', () => {
+            updatePreview();
+            alert('Company information saved!');
+        });
+        
+        // Save Letter Content
+        document.getElementById('saveLetterContent').addEventListener('click', () => {
+            updatePreview();
+            alert('Letter content saved!');
+        });
+        
+        // Save Shipping
+        document.getElementById('saveShipping').addEventListener('click', () => {
+            updatePreview();
+            alert('Shipping and terms saved!');
+        });
+        
+        // Update Preview Function
+        function updatePreview() {
+            // Company Info
+            document.getElementById('preview-senderCompany').textContent = document.getElementById('senderCompany').value;
+            document.getElementById('preview-senderAddress').textContent = document.getElementById('senderAddress').value;
+            document.getElementById('preview-senderPhone').textContent = document.getElementById('senderPhone').value;
+            document.getElementById('preview-senderEmail').textContent = document.getElementById('senderEmail').value;
+            document.getElementById('preview-recipientCompany').textContent = document.getElementById('recipientCompany').value;
+            document.getElementById('preview-recipientAddress').textContent = document.getElementById('recipientAddress').value;
+            document.getElementById('preview-recipientPhone').textContent = document.getElementById('recipientPhone').value;
+            
+            // Letter Content
+            document.getElementById('preview-letterTitle').textContent = document.getElementById('letterTitle').value;
+            document.getElementById('preview-letterGreeting').textContent = document.getElementById('letterGreeting').value;
+            document.getElementById('preview-letterIntro').textContent = document.getElementById('letterIntro').value;
+            document.getElementById('preview-letterBody').textContent = document.getElementById('letterBody').value;
+            document.getElementById('preview-letterConclusion').textContent = document.getElementById('letterConclusion').value;
+            document.getElementById('preview-signatureName').textContent = document.getElementById('signatureName').value;
+            document.getElementById('preview-signatureTitle').textContent = document.getElementById('signatureTitle').value;
+            document.getElementById('preview-letterDate').textContent = document.getElementById('letterDate').value;
+            
+            // Products Table
+            updateProductsPreview();
+            
+            // Shipping & Terms
+            document.getElementById('preview-deliveryNote').textContent = document.getElementById('deliveryNote').value;
+            document.getElementById('preview-sourcingPort').textContent = document.getElementById('sourcingPort').value;
+            document.getElementById('preview-destinationPoint').textContent = document.getElementById('destinationPoint').value;
+            document.getElementById('preview-deliveryTerms').textContent = document.getElementById('deliveryTerms').value;
+            document.getElementById('preview-deliveryTime').textContent = document.getElementById('deliveryTime').value;
+            document.getElementById('preview-paymentMethod').textContent = document.getElementById('paymentMethod').value;
+            
+            // Footer
+            document.getElementById('preview-footer-phone').textContent = document.getElementById('senderPhone').value;
+            document.getElementById('preview-footer-email').textContent = document.getElementById('senderEmail').value;
+            document.getElementById('preview-footer-address').textContent = document.getElementById('senderAddress').value;
+        }
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeProductsTable();
+            updatePreview();
+        });
+    </script>
+</body>
+</html>
