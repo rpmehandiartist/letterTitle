@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Letter of Intent with Admin Panel</title>
+    <!-- Add html2canvas library for image download -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -397,6 +399,38 @@
                 background-color: white;
             }
         }
+
+        /* Loading overlay for image download */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            font-size: 1.5rem;
+            flex-direction: column;
+        }
+
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -407,6 +441,7 @@
                 <h2>Letter of Intent - Admin Panel</h2>
                 <div>
                     <button class="btn btn-primary" id="previewBtn">Preview Changes</button>
+                    <button class="btn btn-secondary" id="downloadImageBtn">Download as Image</button>
                     <button class="btn btn-secondary" id="printBtn">Print</button>
                 </div>
             </div>
@@ -802,6 +837,41 @@ We look forward to working with you on the proposal, hopefully beneficial for bo
         // Print Button
         document.getElementById('printBtn').addEventListener('click', () => {
             window.print();
+        });
+
+        // Download as Image Button
+        document.getElementById('downloadImageBtn').addEventListener('click', () => {
+            // Show loading overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'loading-overlay';
+            overlay.innerHTML = `
+                <div class="loading-spinner"></div>
+                <div>Generating image...</div>
+            `;
+            document.body.appendChild(overlay);
+
+            // Use html2canvas to capture the letter preview
+            html2canvas(document.getElementById('letterPreview'), {
+                scale: 2, // Higher quality
+                logging: false,
+                useCORS: true, // For external images
+                allowTaint: true,
+                scrollX: 0,
+                scrollY: 0
+            }).then(canvas => {
+                // Create download link
+                const link = document.createElement('a');
+                link.download = 'letter-of-intent.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                // Remove loading overlay
+                document.body.removeChild(overlay);
+            }).catch(err => {
+                console.error('Error generating image:', err);
+                alert('Error generating image. Please try again.');
+                document.body.removeChild(overlay);
+            });
         });
         
         // Save Company Info
